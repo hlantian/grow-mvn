@@ -134,3 +134,20 @@ package: com.zxiaoyao.mvn
 [INFO] ------------------------------------------------------------------------
 
 ```
+
+## 坐标
+```text
+    <groupId>com.zxiaoyao.mvn</groupId>
+    <artifactId>hello-world</artifactId>
+    <version>1.0.-SNAPSHOT</version>
+    <packaging>jar</packaging>
+```
+## maven 依赖范围
+
+- compile: 编译依赖范围。默认编译范围。对于编译、测试、运行都有效。
+- test: 测试依赖范围。
+- provided：已提供依赖范围。编译和测试有效，但运行时无效。例如servlet-api编译和测试有效，运行时 由容器提供。
+- runtime:运行时依赖范围。测试和与运行有效，编译时无效。
+- system: 系统依赖范围。与provided一样。但是使用system范围的依赖必须通过systemPath显示地指定依赖文件的路径。
+
+![依赖范围对比](./doc/yilaifanwei.png)
