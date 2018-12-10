@@ -150,7 +150,15 @@ package: com.zxiaoyao.mvn
 - runtime:运行时依赖范围。测试和与运行有效，编译时无效。
 - system: 系统依赖范围。与provided一样。但是使用system范围的依赖必须通过systemPath显示地指定依赖文件的路径。
 
-![依赖范围对比](./doc/yilaifanwei.png)
+依赖范围与classPath的关系：
+
+依赖范围（Scope）|对于编译classPath有效|对于测试classPath有效|对于运行时有效|例子
+---|---|---|---|---
+compile|Y|Y|Y|spring-core
+test|—|Y|—|Junit
+provided|Y|Y|—|servlet-api
+runtime|—|Y|Y|JDBC驱动实现
+system|Y|Y|—|本地的，maven仓库之外的类库文件
 
 ### 可选依赖，可选依赖不会被传递
 
