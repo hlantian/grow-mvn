@@ -151,3 +151,124 @@ package: com.zxiaoyao.mvn
 - system: 系统依赖范围。与provided一样。但是使用system范围的依赖必须通过systemPath显示地指定依赖文件的路径。
 
 ![依赖范围对比](./doc/yilaifanwei.png)
+
+### 可选依赖，可选依赖不会被传递
+
+```text
+  <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.38</version>
+            <optional>true</optional>
+        </dependency>
+```
+如上，如果<optional>为true，则该依赖只对当前项目有效，当其他项目依赖此项目时，此依赖不会被传递。
+
+### 排除依赖
+```text
+      <dependency>
+            <groupId>com.zxiaoyao.mvn</groupId>
+            <artifactId>project-1</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zxiaoyao.mvn</groupId>
+                    <artifactId>project-c</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.zxiaoyao.mvn</groupId>
+            <artifactId>project-c</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+```
+如上配置，项目依赖project-1，但不想引入传递依赖project-c，而自己显式的依赖project-c 的1.1.0版本。
+
+### 归类依赖
+```text
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>3.8.1</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+```
+通过<properties>中进行常量配置，统一版本。
+
+### 依赖优化
+
+运行 mvn dependency:list  查看当前项目已解析依赖
+
+```text
+E:\workspaces\grow-mvn\hello-world>mvn dependency:list
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for com.zxiaoyao.mvn:hello-world:jar:1.0.-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for junit:junit:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 24, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: junit:junit:jar -> version 4.11 vs RELEASE @ line 21, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Hello World Project 1.0.-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] --- maven-dependency-plugin:2.8:list (default-cli) @ hello-world ---
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/repositories/central/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+....
+[INFO]
+[INFO] The following files have been resolved:
+[INFO]    junit:junit:jar:4.13-beta-1:compile
+[INFO]    org.hamcrest:hamcrest-core:jar:1.3:compile
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 25.760 s
+[INFO] Finished at: 2018-12-10T11:36:03+08:00
+[INFO] Final Memory: 17M/197M
+[INFO] ------------------------------------------------------------------------
+
+```
+运行 mvn dependency:tree 解析依赖树：
+```text
+E:\workspaces\grow-mvn\hello-world>mvn dependency:tree
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for com.zxiaoyao.mvn:hello-world:jar:1.0.-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for junit:junit:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 24, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: junit:junit:jar -> version 4.11 vs RELEASE @ line 21, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Hello World Project 1.0.-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ hello-world ---
+[INFO] com.zxiaoyao.mvn:hello-world:jar:1.0.-SNAPSHOT
+[INFO] \- junit:junit:jar:4.13-beta-1:compile
+[INFO]    \- org.hamcrest:hamcrest-core:jar:1.3:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.090 s
+[INFO] Finished at: 2018-12-10T11:38:16+08:00
+[INFO] Final Memory: 13M/155M
+[INFO] ------------------------------------------------------------------------
+
+```
