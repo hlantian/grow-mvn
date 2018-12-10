@@ -272,3 +272,11 @@ E:\workspaces\grow-mvn\hello-world>mvn dependency:tree
 [INFO] ------------------------------------------------------------------------
 
 ```
+
+运行 mvn dependency:analyze 可以对依赖进行分析
+
+## maven仓库
+
+maven仓库分为 本地仓库 和远程仓库，远程仓库又 分为中央仓库和私服以及其他公共仓库
+
+![maven仓库分类](./doc/maven-repository.png)
