@@ -288,3 +288,70 @@ E:\workspaces\grow-mvn\hello-world>mvn dependency:tree
 maven仓库分为 本地仓库 和远程仓库，远程仓库又 分为中央仓库和私服以及其他公共仓库
 
 ![maven仓库分类](./doc/maven-repository.png)
+
+### 本地仓库
+
+一般在~/.m2/repository目录下，可以在setting.xml中修改地址
+```text
+<settings>
+    <localRepository>D:\java\repository</localRepository>
+</settings>
+```
+
+### 中央仓库
+
+中央仓库的地址在超级POM中，$MAVEN_HOME\lib\maven-model-builder-3.5.2.jar\org\apache\maven\model 里面的pom-4.0.0.xml中 有设置
+```text
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+```
+
+### 远程仓库配置
+
+很多情况下，默认的中央仓库无法满足项目要求，可能需要的构件存在于另外一个远程仓库。。可以在pom中配置该仓库
+```text
+<repositories>
+        <repository>
+            <!-- 仓库中心 -->
+            <id>maven-central</id>
+            <name>maven-central</name>
+            <url>http://192.168.88.200:8888/repository/maven-central/</url>
+            <!-- 快照库 -->
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <!-- 发布库 -->
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+```
+注意点：maven自带的中央仓库使用ID为central，如果其他仓库生命也是用该ID，就会覆盖中央仓库的配置。
+对于release和snapshots来说，除了enabled，它们还包含另外两个子元素，updatePolicy，checksumPolicy：
+```text
+<snapshots>
+    <enabled>true</enabled>
+    <updatePolicy>daily</updatePolicy>
+    <checksumPolicy>ignore</checksumPolicy>
+</snapshots>
+```
+updatePolicy 配置更新频率，
+- daily 表示每天检查更新一次 
+- never 从不更新
+- always 每次构建都检查更新
+- interval:X 每隔x分钟检查更新一次(x任意整数)
+
+checksumPolicy 配置 maven检查检验和文件的策略。
+- fail maven遇到校验和错误就让构建失败
+- ignore 忽略错误
+
