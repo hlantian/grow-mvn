@@ -500,4 +500,107 @@ distributionManagement>
 - post-site
 - site-deploy 将项目站点发布到服务器上
 
+### 自定义绑定插件
 
+例如，创建项目的源码包，内置的插件绑定关系并没有涉及这一任务，因此需要自行配置。maven-source-plugin可以帮我们完成这个任务，它的jar-no-fork目标能够将项目中的
+主代码包打成jar文件，可以将其绑定到default生命周期的verify阶段上，执行完集成测试后和安装构建前创建源码jar包：
+```text
+<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
+上述配置中，除了基本的坐标生命外，还有插件执行配置，executions下的每个execution子元素可以用来配置一个执行任务。该例中配置了一个id为attach-sources的任务，
+通过phase配置，将其绑定到verify生命周期阶段上，再通过goals配置指定要执行的插件目标。
+
+有时，不需要配置phase也可以执行，因为很多插件都定义了默认绑定阶段。
+可以通过如下命令了解默认绑定阶段：
+```text
+mvn help:describe -DgroupId=org.apache.maven.plugins -DartifactId=maven-source-plugin -Ddetail
+```
+### 插接配置
+
+通过配置改变某些插件的行为
+
+#### 命令行插件配置
+如：
+```text
+mvn install -Dmaven-test.skip=true
+```
+跳过测试。 -D是java自带的。其功能就是通过命令设置一个java系统属性。maven简单的重用了该参数
+
+### POM中插件全局配置
+
+用户可以在声明插件的时候，对此插件进行一次全局配置。
+下面配置，告诉maven编译java1.5版本的源文件，生成与JVM1.5兼容的字节码文件
+```text
+ <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+### POM 中插件任务配置
+
+除了为插件配置全局参数，用户还可以为某个任务配置特定的参数。以maven-antrun-plugin为例，它有一个目标run，可以用来在maven中调用ant任务。用户将maven-antrun-plugin:run
+绑定到多个生命周期阶段上，再加以不同的配置，就可以让maven在不同生命阶段执行不同的任务：
+```text
+ <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1</version>
+                <executions>
+                    <execution>
+                        <id>ant-validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>I'm bound to validate phase.</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>id-verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>I'm bound to verify phase.</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
