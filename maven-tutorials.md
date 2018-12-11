@@ -454,4 +454,50 @@ distributionManagement>
 3. MVNBrowser http://www.mvnbrowser.com/
 4. MVNrepository http://mvnrepository.com/
 
-   
+## 生命周期
+
+### 三套生命周期：
+
+- clean  ： 清理项目
+- default ：构建项目
+- site    ： 建立项目站点
+
+### clean 生命周期
+1. pre-clean 执行一些清理前需要完成的工作。
+2. clean 清理上次构建生成的文件
+3. post-clean 执行一些清理后需要完成的工作。
+
+### default 生命周期
+- validate
+- initialize
+- generate-sources
+- process-sources 处理项目主资源文件。一般来说，是对src/main/resources目录的内容进行变量替换工作后，复制到项目输出的主classPath目录中。
+- generate-resources
+- process-resources
+- compile 编译项目的主源码。一般来说，是编译src/main/java目录下的java文件至项目输出的主classPath目录中。
+- process-classes
+- generate-test-sources
+- process-test-sources 处理测试资源文件。
+- generate-test-resources
+- process-test-resources
+- test-compile 编译项目的测试代码。
+- process-test-classes
+- test 使用单元测试框架进行测试，测试代码不会被打包或部署
+- prepare-package
+- package 接受编译好的代码，打包成可发布的格式，如JAR。
+- pre-integration-test
+- integration-test
+- post-integration-test
+- verify
+- install 将包安装到Maven本地仓库，供本地其他maven项目使用。
+- deploy 将最终的包复制到远程仓库，供其他开发人员和maven项目使用。
+
+详情：https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
+
+### site 生命周期
+- pre-site 执行一些在生成项目站点之前需要完成的工作
+- site 生成站点文档
+- post-site
+- site-deploy 将项目站点发布到服务器上
+
+
