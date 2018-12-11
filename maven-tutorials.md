@@ -355,3 +355,103 @@ checksumPolicy 配置 maven检查检验和文件的策略。
 - fail maven遇到校验和错误就让构建失败
 - ignore 忽略错误
 
+
+### 远程仓库的认证
+大部分仓库无需认证就可以访问，但有时候出于安全考虑，需要天宫认证信息才能访问一些远程仓库。
+
+配置认证信息必须配置到settings.xml文件中
+```text
+<servers>
+    <server>
+      <id>>maven-central</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+	 <server>
+      <id>maven-releases</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+  </servers>
+```
+**这边的id必须与POM中需要认证的repository元素的id完全一致。**
+
+### 部署到远程仓库
+
+私服一大作用是部署第三方构建，包括组织内部生成的构件
+```text
+distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Nexus release</name>
+            <url>http://192.168.88.200:8888/repository/maven-central/</url>
+        </repository>
+        <site>
+            <id>nexus</id>
+            <name>Nexus Sites</name>
+            <url>dav:http://192.168.88.200:8888/repository/maven-central/</url>
+        </site>
+    </distributionManagement>
+```
+
+### 镜像
+如果仓库X可以提供仓库Y存储的所有内容，那么就可以认为X是Y的一个镜像。
+由于地理因素，国内镜像比中央仓库更快，可以在setting.xml中配置镜像来替代中央仓库：
+```text
+ <mirrors>
+	<!-- 阿里云仓库 -->
+	<mirror>
+		<id>alimaven</id>
+		<mirrorOf>central</mirrorOf>
+		<name>aliyun maven</name>
+		<url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+	</mirror>
+
+	<!-- 中央仓库1 -->
+	<mirror>
+		<id>repo1</id>
+		<mirrorOf>central</mirrorOf>
+		<name>Human Readable Name for this Mirror.</name>
+		<url>http://repo1.maven.org/maven2/</url>
+	</mirror>
+
+	<!-- 中央仓库2 -->
+	<mirror>
+		<id>repo2</id>
+		<mirrorOf>central</mirrorOf>
+		<name>Human Readable Name for this Mirror.</name>
+		<url>http://repo2.maven.org/maven2/</url>
+	</mirror> 
+  </mirrors>
+```
+
+<mirrorOf>的值为central 标识该而配置为中央仓库，任何对于中央仓库的请求都会转至该镜像。
+
+关于镜像的一个更为常用的用法是结合私服，由于私服可以代理任何外部的公共（中央仓库），因此，组织内部的maven用户来说，使用一个私服地址就等于了所有需要啊的外部私服：
+```text
+<mirrors>
+	<!-- 阿里云仓库 -->
+	<mirror>
+		<id>internal-repository</id>
+		<mirrorOf>*</mirrorOf>
+		<name>siFu</name>
+		<url>http://192.168.88.200:8888/rep/c1</url>
+	</mirror>
+  </mirrors>
+```
+
+- <mirrorOf>*</mirrorOf> ：匹配所有远程仓库
+- <mirrorOf>external:*</mirrorOf> : 匹配所有远程仓库，使用localhost的除外，使用file：//的除外
+- <mirrorOf>repo1,repo2</mirrorOf> : 匹配repo1和repo2，使用逗号分隔多个远程仓库
+- <mirrorOf>*,! repo1</mirrorOf> : 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除
+
+需要注意的是,由于镜像仓库完全屏蔽了被镜像仓库，当镜像仓库不稳定或者停止服务的时候就无法下载构建
+
+### 仓库搜索服务：
+
+1. Sonatype Nexus http://repository.sonatype.org/
+2. Jarvana http://www.jarvana.com/jarvana/
+3. MVNBrowser http://www.mvnbrowser.com/
+4. MVNrepository http://mvnrepository.com/
+
+   
