@@ -604,3 +604,21 @@ mvn install -Dmaven-test.skip=true
         </plugins>
     </build>
 ```
+
+## 灵活构建
+
+### maven 属性
+
+### 默认属性
+内置属性：
+
+- ${basedir} 表示项目根目录， 即 pom.xml的目录
+- ${version} 项目的版本
+
+POM属性：
+
+- ${project.artifactId} 对应artifactId 值
+- ${project.build.sourceDirectory} 项目主源码目录，默认为src/main/java。
+---
+
+ 
